@@ -12,13 +12,13 @@ A full-stack expense tracker application with a Node.js backend and vanilla Java
 
 ## Tech Stack
 
-- **Backend**: Node.js, Express, SQLite
+- **Backend**: Node.js, Express, JSON file storage
 - **Frontend**: HTML, CSS, JavaScript
-- **Database**: SQLite for persistence
+- **Database**: JSON file for persistence (simple and deployment-friendly)
 
 ## Design Decisions
 
-- **Database Choice**: SQLite was chosen for its simplicity, file-based storage, and no need for a separate database server. It's suitable for a small application and can handle the required operations efficiently.
+- **Database Choice**: Initially SQLite for file-based storage, but switched to JSON file for easier deployment on cloud platforms like Render/Vercel, avoiding native binary issues. Data persists in `expenses.json`.
 - **Idempotency**: Used UUID for expense IDs to ensure that retries of the same request don't create duplicates.
 - **Frontend**: Kept simple with vanilla JavaScript to focus on functionality without adding complexity from frameworks.
 - **Validation**: Basic client-side and server-side validation for required fields and positive amounts.

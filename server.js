@@ -23,40 +23,23 @@ app.post('/expenses', (req, res) => {
   }
 
   const id = uuidv4();
+  const expense = { id, amount, category, description, date, created_at: new Date().toISOString() };
 
-  const sql = `INSERT INTO expenses (id, amount, category, description, date) VALUES (?, ?, ?, ?, ?)`;
-  db.run(sql, [id, amount, category, description, date], function(err) {
-    if (err) {
-      console.error(err.message);
-      return res.status(500).json({ error: 'Failed to create expense' });
-    }
-    res.status(201).json({ id, amount, category, description, date, created_at: new Date().toISOString() });
-  });
+  db.add(expense);
+  res.status(201).json(expense);
 });
 
 // GET /expenses - List expenses with optional filters
 app.get('/expenses', (req, res) => {
   const { category, sort } = req.query;
 
-  let sql = `SELECT * FROM expenses`;
-  let params = [];
-
-  if (category) {
-    sql += ` WHERE category = ?`;
-    params.push(category);
-  }
+  let expenses = db.filter(category);
 
   if (sort === 'date_desc') {
-    sql += ` ORDER BY date DESC`;
+    expenses = db.sortByDateDesc().filter(e => !category || e.category === category);
   }
 
-  db.all(sql, params, (err, rows) => {
-    if (err) {
-      console.error(err.message);
-      return res.status(500).json({ error: 'Failed to retrieve expenses' });
-    }
-    res.json(rows);
-  });
+  res.json(expenses);
 });
 
 app.listen(PORT, () => {

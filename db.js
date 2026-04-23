@@ -1,21 +1,44 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./expenses.db', (err) => {
-  if (err) {
-    console.error(err.message);
+const fs = require('fs');
+const path = require('path');
+
+const DB_FILE = path.join(__dirname, 'expenses.json');
+
+// Ensure the file exists
+if (!fs.existsSync(DB_FILE)) {
+  fs.writeFileSync(DB_FILE, JSON.stringify([]));
+}
+
+function readExpenses() {
+  try {
+    const data = fs.readFileSync(DB_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    console.error('Error reading expenses:', err);
+    return [];
   }
-  console.log('Connected to the SQLite database.');
-});
+}
 
-// Create table if not exists
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS expenses (
-    id TEXT PRIMARY KEY,
-    amount REAL NOT NULL,
-    category TEXT NOT NULL,
-    description TEXT,
-    date TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
-});
+function writeExpenses(expenses) {
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(expenses, null, 2));
+  } catch (err) {
+    console.error('Error writing expenses:', err);
+  }
+}
 
-module.exports = db;
+module.exports = {
+  getAll: readExpenses,
+  add: (expense) => {
+    const expenses = readExpenses();
+    expenses.push(expense);
+    writeExpenses(expenses);
+  },
+  filter: (category) => {
+    const expenses = readExpenses();
+    return category ? expenses.filter(e => e.category === category) : expenses;
+  },
+  sortByDateDesc: () => {
+    const expenses = readExpenses();
+    return expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
+};
