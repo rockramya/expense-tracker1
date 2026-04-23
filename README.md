@@ -26,9 +26,9 @@ A full-stack expense tracker application with a Node.js backend and vanilla Java
 ## Trade-offs
 
 - No authentication or user management, as it's a personal finance tool for a single user.
-- In-memory or file-based persistence; for production, a more robust database might be needed.
-- Limited error handling and loading states due to time constraints.
-- No automated tests implemented.
+- File-based SQLite persistence; suitable for demo but may need migration for production scale.
+- No automated tests or summary views implemented (nice-to-have).
+- Basic error and loading states added for robustness.
 
 ## Setup
 
